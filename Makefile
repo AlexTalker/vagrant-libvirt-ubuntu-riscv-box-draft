@@ -1,4 +1,4 @@
-.PHONY: default
+.PHONY: default clean
 
 UBUNTU_RELEASE ?= 23.04
 UBUNTU_IMG_NAME ?= ubuntu-$(UBUNTU_RELEASE)-preinstalled-server-riscv64+unmatched.img
@@ -14,14 +14,13 @@ default: $(UBUNTU_BOX_NAME)
 	@echo "Successfully created vagrant-libvirt box: $(UBUNTU_BOX_NAME)"
 	@echo "Completed!"
 
-
-# TODO: Generate resulting archive
+# Manually craft the Vagrant box:
+# https://github.com/vagrant-libvirt/vagrant-libvirt/tree/main/example_box
 $(UBUNTU_BOX_NAME): $(UBUNTU_IMG_QCOW) metadata.json Vagrantfile
-	@false
+	@tar -cvzf "$(UBUNTU_BOX_NAME)" "$(UBUNTU_IMG_QCOW)" metadata.json Vagrantfile
 
-# TODO: Call a script to generate the JSON file
 metadata.json: $(UBUNTU_IMG_QCOW)
-	@false
+	@python helpers/gen-metadata-json.py "$(UBUNTU_IMG_QCOW)"
 
 $(UBUNTU_IMG_QCOW): $(UBUNTU_IMG_NAME)
 	@cp --verbose "$<" "$(UBUNTU_IMG_TMP)"
@@ -33,3 +32,12 @@ $(UBUNTU_IMG_NAME): $(UBUNTU_IMG_COMPRESSED)
 
 $(UBUNTU_IMG_COMPRESSED):
 	@curl -L -O "$(UBUNTU_RELEASE_URL)"
+
+clean:
+	@rm --verbose --force \
+		"$(UBUNTU_IMG_COMPRESSED)" \
+		"$(UBUNTU_IMG_NAME)" \
+		"$(UBUNTU_IMG_TMP)" \
+		"$(UBUNTU_IMG_QCOW)" \
+		"$(UBUNTU_BOX_NAME)" \
+		metadata.json

@@ -2,6 +2,21 @@
 
 set -e
 
+shopt -s nullglob
+
+function cleanup() {
+    # Avoid recursion
+    trap - EXIT
+
+    [ -n "${CIDATA_PARTITION}" ] && umount "${CIDATA_PARTITION}"
+    [ -n "${LOOP_DEV}" ] && {
+        kpartx -d "${LOOP_DEV}" || true
+        losetup -d "${LOOP_DEV}"
+    }
+}
+
+trap cleanup EXIT
+
 RAW_IMAGE="${1}"
 LOOP_DEV=$(losetup --find --nooverlap --partscan --show "${RAW_IMAGE}")
 
@@ -34,9 +49,4 @@ mount "${CIDATA_PARTITION}" "${CIDATA_DIR}"
 # TODO: Copy our cloudinit information into the partition
 ls -lah "${CIDATA_DIR}"
 
-# TODO: Move into cleanup hook
-umount "${CIDATA_PARTITION}"
-
-kpartx -d "${LOOP_DEV}"
-
-losetup -d "${LOOP_DEV}"
+cp --verbose cidata/* "${CIDATA_DIR}"
