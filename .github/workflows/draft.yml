@@ -1,0 +1,27 @@
+name: Build Vagrant box for libvirt
+on: [ workflow_dispatch ]
+
+env:
+  MAJOR: 24.04
+  MINOR: .1
+
+jobs:
+  build-the-box:
+    name: Build the Vagrant box for libvirt
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Install dependencies
+        run: make UBUNTU_RELEASE_MAJOR=${{ env.MAJOR }} UBUNTU_RELEASE_MINOR=${{ env.MINOR }} prep
+      -
+        name: Building the box
+        run: make UBUNTU_RELEASE_MAJOR=${{ env.MAJOR }} UBUNTU_RELEASE_MINOR=${{ env.MINOR }}
+      -
+        name: Upload the box artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vagrant-libvirt-ubuntu
+          path: *.box
