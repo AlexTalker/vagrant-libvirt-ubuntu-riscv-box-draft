@@ -2,8 +2,8 @@ name: Build Vagrant box for libvirt
 on: [ workflow_dispatch ]
 
 env:
-  MAJOR: 24.04
-  MINOR: .1
+  MAJOR: "24.04"
+  MINOR: ".1"
 
 jobs:
   build-the-box:
