@@ -1,9 +1,14 @@
 .PHONY: default clean prep deps
 
-UBUNTU_RELEASE ?= 23.04
-UBUNTU_IMG_NAME ?= ubuntu-$(UBUNTU_RELEASE)-preinstalled-server-riscv64+unmatched.img
+UBUNTU_RELEASE_MAJOR ?= 24.04
+UBUNTU_RELEASE_MINOR ?= .1
+UBUNTU_RELEASE ?= $(UBUNTU_RELEASE_MAJOR)$(UBUNTU_RELEASE_MINOR)
+# Prior to 24.04 LTS:
+# UBUNTU_RELEASE_VARIANT := preinstalled-server-riscv64+unmatched
+UBUNTU_RELEASE_VARIANT ?= preinstalled-server-riscv64
+UBUNTU_IMG_NAME ?= ubuntu-$(UBUNTU_RELEASE)-$(UBUNTU_RELEASE_VARIANT).img
 UBUNTU_IMG_COMPRESSED := $(UBUNTU_IMG_NAME).xz
-UBUNTU_RELEASE_URL ?= https://cdimage.ubuntu.com/releases/23.04/release/$(UBUNTU_IMG_COMPRESSED)
+UBUNTU_RELEASE_URL ?= https://cdimage.ubuntu.com/releases/$(UBUNTU_RELEASE_MAJOR)/release/$(UBUNTU_IMG_COMPRESSED)
 UBUNTU_IMG_TMP := ubuntu.img
 UBUNTU_IMG_QCOW := box.img
 UBUNTU_BOX_NAME := ubuntu-riscv-$(UBUNTU_RELEASE).box
